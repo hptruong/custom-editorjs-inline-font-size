@@ -38,6 +38,22 @@ class FontSizeTool {
 
   createSvg = undefined;
 
+  fontSizeOptions = [];
+
+  defaultFontSizeOptions = [
+    { label: '10', value: '1' },
+    { label: '13', value: '2' },
+    { label: '16', value: '3' },
+    { label: '18', value: '4' },
+    { label: '24', value: '5' },
+    { label: '32', value: '6' },
+    { label: '48', value: '7' }
+  ];
+
+  constructor({ config }) {
+    this.fontSizeOptions = config?.fontSizeList || this.defaultFontSizeOptions;
+  }
+
   make(tagName, classNames = null) {
     const el = document.createElement(tagName);
 
@@ -67,19 +83,19 @@ class FontSizeTool {
   }
 
   addFontSizeOptions() {
-    const fontSizeList = [
-      { label: '10', value: '1' },
-      { label: '13', value: '2' },
-      { label: '16', value: '3' },
-      { label: '18', value: '4' },
-      { label: '24', value: '5' },
-      { label: '32', value: '6' },
-      { label: '48', value: '7' }
-    ];
+    // const fontSizeList = [
+    //   { label: '10', value: '1' },
+    //   { label: '13', value: '2' },
+    //   { label: '16', value: '3' },
+    //   { label: '18', value: '4' },
+    //   { label: '24', value: '5' },
+    //   { label: '32', value: '6' },
+    //   { label: '48', value: '7' }
+    // ];
     this.selectionList = this.make('div', 'selectionList');
     const selectionListWrapper = this.make('div', 'selection-list-wrapper');
 
-    for (const fontSize of fontSizeList) {
+    for (const fontSize of this.fontSizeOptions) {
       const option = this.make('div');
       option.setAttribute('value', fontSize.value);
       option.setAttribute('id', fontSize.value);
