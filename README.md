@@ -39,15 +39,7 @@ var editor = EditorJS({
     fontSize: {
       class: FontSizeTool,
       config: {
-        fontSizeList: [
-          { label: '10', value: '1' },
-          { label: '12', value: '2' },
-          { label: '16', value: '3' },
-          { label: '18', value: '4' },
-          { label: '24', value: '5' },
-          { label: '32', value: '6' },
-          { label: '48', value: '7' }
-        ]
+        fontSizeList: ['10', '12', '14', '16', '18', '20', '24', '28', '32'],
       }
     }
   }

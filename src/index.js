@@ -40,15 +40,17 @@ class FontSizeTool {
 
   fontSizeOptions = [];
 
-  defaultFontSizeOptions = [
-    { label: '10', value: '1' },
-    { label: '13', value: '2' },
-    { label: '16', value: '3' },
-    { label: '18', value: '4' },
-    { label: '24', value: '5' },
-    { label: '32', value: '6' },
-    { label: '48', value: '7' }
-  ];
+  // defaultFontSizeOptions = [
+  //   { label: '10', value: '1' },
+  //   { label: '13', value: '2' },
+  //   { label: '16', value: '3' },
+  //   { label: '18', value: '4' },
+  //   { label: '24', value: '5' },
+  //   { label: '32', value: '6' },
+  //   { label: '48', value: '7' }
+  // ];
+
+  defaultFontSizeOptions = ['10', '13', '16', '18', '24', '32', '48'];
 
   constructor({ config }) {
     this.fontSizeOptions = config?.fontSizeList || this.defaultFontSizeOptions;
@@ -83,27 +85,18 @@ class FontSizeTool {
   }
 
   addFontSizeOptions() {
-    // const fontSizeList = [
-    //   { label: '10', value: '1' },
-    //   { label: '13', value: '2' },
-    //   { label: '16', value: '3' },
-    //   { label: '18', value: '4' },
-    //   { label: '24', value: '5' },
-    //   { label: '32', value: '6' },
-    //   { label: '48', value: '7' }
-    // ];
     this.selectionList = this.make('div', 'selectionList');
     const selectionListWrapper = this.make('div', 'selection-list-wrapper');
 
     for (const fontSize of this.fontSizeOptions) {
       const option = this.make('div');
-      option.setAttribute('value', fontSize.value);
-      option.setAttribute('id', fontSize.value);
+      option.setAttribute('value', fontSize);
+      option.setAttribute('id', fontSize);
       option.classList.add('selection-list-option');
-      if ((document.getElementById(this.fontSizeDropDown).innerHTML === fontSize.label) || (this.selectedFontSize === fontSize.value)) {
+      if ((document.getElementById(this.fontSizeDropDown).innerHTML === fontSize) || (this.selectedFontSize === fontSize)) {
         option.classList.add('selection-list-option-active');
       }
-      option.innerHTML = fontSize.label;
+      option.innerHTML = fontSize;
       selectionListWrapper.append(option);
     }
     this.selectionList.append(selectionListWrapper);
@@ -161,7 +154,23 @@ class FontSizeTool {
 
   surround(range) {
     if (this.selectedFontSize) {
-      document.execCommand('fontSize', false, this.selectedFontSize);
+      const selectedFontSizeOption = this.fontSizeOptions.find(
+        fontSize => fontSize === this.selectedFontSize
+      );
+  
+      if (selectedFontSizeOption) {
+        const fontSizeValue = selectedFontSizeOption;
+        const lineHeightValue = Math.round(parseInt(fontSizeValue) * 1.5);
+  
+        const fontNode = document.createElement('span');
+        fontNode.style.fontSize = `${fontSizeValue}px`;
+        fontNode.style.lineHeight = `${lineHeightValue}px`;
+
+        fontNode.textContent = window.getSelection().toString();
+  
+        range.deleteContents();
+        range.insertNode(fontNode);
+      }
     }
   }
 
@@ -170,22 +179,19 @@ class FontSizeTool {
   };
   
   checkState(selection) {
-    const isActive = document.queryCommandState('fontSize');
-    let anchoredElementFontSize = this.getComputedFontStyle(selection.anchorNode);
+    const anchoredElementFontSize = this.getComputedFontStyle(selection.anchorNode);
     const focusedElementFontSize = this.getComputedFontStyle(selection.focusNode);
+
     if (anchoredElementFontSize === focusedElementFontSize) {
-      anchoredElementFontSize = anchoredElementFontSize.slice(0, anchoredElementFontSize.indexOf('p'));
-      const elementContainsDecimalValue = anchoredElementFontSize.indexOf('.');
-      if (elementContainsDecimalValue !== -1) {
-        anchoredElementFontSize = anchoredElementFontSize.slice(0, anchoredElementFontSize.indexOf('.'));
+      let fontSizeValue = this.selectedFontSize || parseInt(anchoredElementFontSize);
+      if (isNaN(fontSizeValue)) {
+        fontSizeValue = this.emptyString;
       }
-      this.replaceFontSizeInWrapper(anchoredElementFontSize);
+      this.replaceFontSizeInWrapper(fontSizeValue);
+    } else {
+      this.replaceFontSizeInWrapper(this.emptyString);
     }
-    else {
-      const emptyWrapper = this.emptyString;
-      this.replaceFontSizeInWrapper(emptyWrapper);
-    }
-    return isActive;
+    return anchoredElementFontSize !== null;
   }
 
   replaceFontSizeInWrapper(size) {
